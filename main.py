@@ -11,11 +11,11 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
 
     while len(event.get(QUIT)) == 0:
         clock.tick(100)
-        begin_frame_time = perf_counter()
+        begin = perf_counter()
         surface.fill(background_color, surface.get_rect())
         [point.update(surface, points) for point in points]
-        end_frame_time = perf_counter()
-        print_debug_info(surface, font, points, begin_frame_time, end_frame_time)
+        end = perf_counter()
+        print_debug_info(surface, font, points, begin, end)
         display.flip()
         mouse_handle(
             on_left_click=lambda pos: points.append(Point(pos)),
