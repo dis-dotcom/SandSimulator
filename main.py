@@ -23,24 +23,25 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         )
 
 
-def print_debug_info(surface, font, points, begin_frame_time, end_frame_time):
+def print_debug_info(surface, font, points, begin, end):
+    elapsed = int(round((end - begin) * 1000, 0))
     info = {
         'Objects': str(len(points)),
         'Frozen': f'{percent_frozen(points)} %',
-        'Elapsed': f'{elapsed(begin_frame_time, end_frame_time)} ms.'
+        'Elapsed': f'{elapsed} ms.'
     }
     surface.blit(debug(info, font), (0, 0))
 
 
 def debug(info: dict, font: dict):
-    y, shift = 0, 20
-    size = 500, len(info) * (shift + 5)
+    y = 0
+    size = 500, len(info) * (font['size'] + 5)
     surface = Surface(size)
     surface.fill(font['background_color'])
     for key in info.keys():
         line = f'{key}: {info[key]}'
         surface.blit(font['value'].render(line, True, font['color']), (15, y))
-        y += shift
+        y += font['size']
 
     return surface
 
@@ -65,10 +66,6 @@ def configure_display(size=(500, 500)):
     return surface
 
 
-def elapsed(begin, end):
-    return round((end - begin) * 1000, 3)
-
-
 def percent_frozen(points: list):
     if len(points) > 0:
         count_frozen = len(list(filter(lambda point: point.frozen, points)))
@@ -77,11 +74,12 @@ def percent_frozen(points: list):
     return 0.00
 
 
-def get_font(background_color):
+def get_font(background_color, size=20):
     return {
-        'value': pygame.font.SysFont('Segoe UI', 20),
+        'value': pygame.font.SysFont('Segoe UI', size),
         'color': Color(0, 0, 0),
-        'background_color': background_color
+        'background_color': background_color,
+        'size': size
     }
 
 
