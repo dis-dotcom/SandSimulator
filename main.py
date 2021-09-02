@@ -1,4 +1,4 @@
-from pygame import init, display, time, event, QUIT, Color, Surface, mouse, font
+from pygame import init, display, time, event, QUIT, Color, Surface, mouse, font, quit
 from time import perf_counter
 from Point import Point
 from random import randint
@@ -11,28 +11,46 @@ def main():
     display.set_caption('', '')
     display.set_icon(get_icon())
     loop(surface, time.Clock())
+    quit()
 
 
 def loop(surface, clock, points=[]):
     text_color = Color(0, 0, 0)
     background_color = Color(255, 255, 255)
     my_font = font.SysFont('Segoe UI', 20)
-    font_location = [15, 0]
 
     while len(event.get(QUIT)) == 0:
         clock.tick(100)
         begin_frame_time = perf_counter()
         surface.fill(background_color, surface.get_rect())
         [point.update(surface, points) for point in points]
-        p = percent_frozen(list([point.frozen for point in points]))
         end_frame_time = perf_counter()
-        info = f'Objects: {len(points)} Frozen: {p} % Elapsed: {elapsed(begin_frame_time, end_frame_time)} ms.'
-        surface.blit(my_font.render(info, True, text_color), font_location)
+
+        info = {
+            'Objects': f'{len(points)}',
+            'Frozen': f'{percent_frozen(points)} %',
+            'Elapsed': f'{elapsed(begin_frame_time, end_frame_time)} ms.'
+        }
+
+        surface.blit(debug(info, my_font, background_color, text_color), (0, 0))
         display.flip()
         mouse_handle(
             on_left_click=lambda pos: points.append(Point(pos)),
             on_right_click=lambda: points.clear()
         )
+
+
+def debug(info, my_font, background_color, text_color):
+    y, shift = 0, 20
+    size = 500, len(info) * (shift + 5)
+    surface = Surface(size)
+    surface.fill(background_color)
+    for key in info.keys():
+        line = f'{key}: {info[key]}'
+        surface.blit(my_font.render(line, True, text_color), (15, y))
+        y += shift
+
+    return surface
 
 
 def mouse_handle(on_left_click, on_right_click):
@@ -57,10 +75,11 @@ def elapsed(begin, end):
 
 
 def percent_frozen(points: list):
-    if len(points) == 0:
-        return 0.0
-    count_frozen = len(list(filter(lambda x: x == True, points)))
-    return round(count_frozen / len(points) * 100, 0)
+    if len(points) > 0:
+        count_frozen = len(list(filter(lambda point: point.frozen, points)))
+        return round(count_frozen / len(points) * 100, 0)
+
+    return 0.0
 
 
 if __name__ == '__main__':
