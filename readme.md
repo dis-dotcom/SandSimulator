@@ -4,7 +4,8 @@
 	<meta charset="utf-8">
 </head>
 <body>
-	<p>LMB - Create points</p>
-	<p>RMB - Clear</p>
+    <h2>Commands</h2>
+	<p><b>LMB</b> - Create points</p>
+	<p><b>RMB</b> - Clear</p>
 </body>
 </html>
