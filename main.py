@@ -1,6 +1,7 @@
 from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
 from time import perf_counter
 from Point import Point
+from DoublePoint import DoublePoint
 from random import randint
 import pygame
 
