@@ -9,6 +9,7 @@ class Point:
         self.x, self.y = pos
         self.frozen = False
         self.counter = 0
+        self.active = True
 
     def pos(self):
         return self.x, self.y
