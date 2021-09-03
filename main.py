@@ -1,8 +1,7 @@
 from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
 from time import perf_counter
-from Point import Point
-from DoublePoint import DoublePoint
-from random import randint
+from Point import EmptyPoint, Point
+from random import randint, choice
 import pygame
 
 
@@ -19,7 +18,7 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         print_debug_info(surface, font, points, begin, end)
         display.flip()
         mouse_handle(
-            on_left_click=lambda pos: points.append(Point(pos)),
+            on_left_click=lambda x, y: points.append(Point(x, y)),
             on_right_click=points.clear
         )
 
@@ -53,7 +52,7 @@ def mouse_handle(on_left_click, on_right_click):
         shift = 5
         x, y = mouse.get_pos()
         shift_x, shift_y = randint(-shift, shift), randint(-shift, shift)
-        on_left_click((x + shift_x, y + shift_y))
+        on_left_click(x + shift_x, y + shift_y)
     elif buttons[2]:
         on_right_click()
 
