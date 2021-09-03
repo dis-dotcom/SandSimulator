@@ -1,6 +1,6 @@
 from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
 from time import perf_counter
-from Point import EmptyPoint, Point
+from Point import Point
 from random import randint, choice
 import pygame
 
