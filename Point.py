@@ -23,35 +23,51 @@ class Point:
         self.paint(surface)
 
     def down(self, points: list):
-        left, down, right = self.get_targets()
-        can_down = Point.can_move(down, points)
-        can_left = Point.can_move(left, points)
-        can_right = Point.can_move(right, points)
+        target = self.can_move(points)
+        if target:
+            self.y = target.y
 
-        if can_down and down.y <= 499:
-            self.y = down.y
-            return
-        if can_left and left.y <= 499:
-            self.y = left.y
-            return
-        if can_right and right.y <= 499:
-            self.y = right.y
-            return
-
-        if not can_down and not can_left and not can_right:
+        if self.y >= 500:
             self.frozen = True
 
-    @staticmethod
-    def is_busy(target, points):
+    def can_move(self, points):
+        step, can_left, can_down, can_right = randint(1, 3), True, True, True
+        left, right = Point(self.x - 1, self.y + 1), Point(self.x + 1, self.y + 1)
+        down = self.get_down_point(step)
+
         for point in points:
-            if (point.x, point.y) == (target.x, target.y):
-                return True, point
-        return False, None
+            if can_down and down in point:
+                can_down = False
+            if can_left and left in point:
+                can_left = False
+            if can_right and right in point:
+                can_right = False
 
-    @staticmethod
-    def can_move(target, points):
-        busy, point = Point.is_busy(target, points)
-        return not busy
+        if can_down:
+            return down
+        elif can_left and can_right:
+            return left if randint(0, 1) == 0 else right
+        elif can_left:
+            return left
+        elif can_right:
+            return right
+        else:
+            return None
 
-    def get_targets(self):
-        return Point(self.x - 1, self.y + 1), Point(self.x, self.y + randint(1, 3)), Point(self.x + 1, self.y + 1)
+    def get_down_point(self, step):
+        return Point(self.x, self.y + step)
+        if step == 1:
+            return {
+                1: Point(self.x, self.y + 1)
+            }
+        if step == 2:
+            return {
+                1: Point(self.x, self.y + 1),
+                2: Point(self.x, self.y + 2)
+            }
+        if step == 3:
+            return {
+                1: Point(self.x, self.y + 1),
+                2: Point(self.x, self.y + 2),
+                3: Point(self.x, self.y + 3)
+            }
