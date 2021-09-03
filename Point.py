@@ -1,67 +1,52 @@
-from pygame import draw
+from pygame import draw, Color
 from random import randint
 
 
 class Point:
-    color = [128, 128, 128]
+    color = Color(128, 128, 128)
 
-    def __init__(self, pos):
-        self.x, self.y = pos
+    def __init__(self, x, y):
+        self.x, self.y = x, y
         self.frozen = False
-        self.counter = 0
-        self.active = True
 
-    def pos(self):
-        return self.x, self.y
-
-    def paint(self, surface):
-        draw.line(surface, Point.color, self.pos(), self.pos())
+    def __contains__(self, item):
+        if isinstance(item, Point):
+            return (item.x, item.y) == (self.x, self.y)
 
     def update(self, surface, points):
-        if self.frozen:
-            self.paint(surface)
-        else:
+        if not self.frozen:
             self.down(points)
-            self.paint(surface)
+
+        self.paint(surface)
+
+    def paint(self, surface):
+        draw.line(surface, Point.color, (self.x, self.y), (self.x, self.y))
 
     def down(self, points):
-        down_step = + randint(1, 3)
-        target_down = self.x, self.y + down_step
-        target_left = self.x - 1, self.y + 1
-        target_right = self.x + 1, self.y + 1
-
+        left, down, right = self.get_targets()
         can_down, can_left, can_right = True, True, True
 
         for point in points:
-            if can_down and (point.x, point.y) == target_down:
-                can_down = False
-            if can_left and (point.x, point.y) == target_left:
-                can_left = False
-            if can_right and (point.x, point.y) == target_right:
-                can_right = False
+            if can_down and down in point: can_down = False
+            if can_left and left in point: can_left = False
+            if can_right and right in point: can_right = False
 
-        target = Point.get_target(can_down, can_left, can_right, target_down, target_left, target_right)
+        target = Point.get_target(can_down, can_left, can_right, down, left, right)
 
         if target:
-            self.counter = 0
-            if target[1] >= 499:
-                self.x, self.y = target
-                self.frozen = True
-            else:
-                self.x, self.y = target
-        else:
-            self.counter += 1
-            if self.counter == 1000:
+            if target.y >= 499:
                 self.frozen = True
 
+            self.x, self.y = target.x, target.y
+
+    def get_targets(self):
+        step = randint(1, 3)
+        return Point(self.x - 1, self.y), Point(self.x, self.y + step), Point(self.x + 1, self.y)
+
     @staticmethod
-    def get_target(can_down, can_left, can_right, target_down, target_left, target_right):
-        if can_down:
-            return target_down
-        if can_left and can_right:
-            return target_left if randint(0, 1) == 0 else target_right
-        if can_left:
-            return target_left
-        if can_right:
-            return target_right
+    def get_target(can_down, can_left, can_right, down, left, right):
+        if can_down: return down
+        if can_left and can_right: return left if randint(0, 1) == 0 else right
+        if can_left: return left
+        if can_right: return right
         return None
