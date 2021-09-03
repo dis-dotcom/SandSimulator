@@ -10,8 +10,7 @@ class Point:
         self.frozen = frozen
 
     def __contains__(self, item):
-        if isinstance(item, Point):
-            return (item.x, item.y) == (self.x, self.y)
+        return (item.x, item.y) == (self.x, self.y)
 
     def paint(self, surface):
         draw.line(surface, Point.color, (self.x, self.y), (self.x, self.y))
