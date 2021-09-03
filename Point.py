@@ -18,56 +18,36 @@ class Point:
 
     def update(self, surface, points):
         if not self.frozen:
-            self.down(points)
+            self.move_down(points)
 
         self.paint(surface)
 
-    def down(self, points: list):
-        target = self.can_move(points)
+    def move_down(self, points: list):
+        step = randint(1, 3)
+        down_1 = Point(self.x, self.y + 1)
+        can_down_1 = Point.can_move_to(down_1, points)
+        down_2 = Point(self.x, self.y + 2)
+        can_down_2 = Point.can_move_to(down_2, points)
+        down_3 = Point(self.x, self.y + 3)
+        can_down_3 = Point.can_move_to(down_3, points)
+        target = None
+
+        if step == 1 and can_down_1:
+            target = down_1
+        if step == 2 and can_down_1 and can_down_2:
+            target = down_2
+        if step == 3 and can_down_1 and can_down_2 and can_down_3:
+            target = down_3
+
         if target:
             self.y = target.y
 
         if self.y >= 500:
             self.frozen = True
 
-    def can_move(self, points):
-        step, can_left, can_down, can_right = randint(1, 3), True, True, True
-        left, right = Point(self.x - 1, self.y + 1), Point(self.x + 1, self.y + 1)
-        down = self.get_down_point(step)
-
+    @staticmethod
+    def can_move_to(target, points):
         for point in points:
-            if can_down and down in point:
-                can_down = False
-            if can_left and left in point:
-                can_left = False
-            if can_right and right in point:
-                can_right = False
-
-        if can_down:
-            return down
-        elif can_left and can_right:
-            return left if randint(0, 1) == 0 else right
-        elif can_left:
-            return left
-        elif can_right:
-            return right
-        else:
-            return None
-
-    def get_down_point(self, step):
-        return Point(self.x, self.y + step)
-        if step == 1:
-            return {
-                1: Point(self.x, self.y + 1)
-            }
-        if step == 2:
-            return {
-                1: Point(self.x, self.y + 1),
-                2: Point(self.x, self.y + 2)
-            }
-        if step == 3:
-            return {
-                1: Point(self.x, self.y + 1),
-                2: Point(self.x, self.y + 2),
-                3: Point(self.x, self.y + 3)
-            }
+            if target in point:
+                return False
+        return True
