@@ -4,6 +4,7 @@ from random import randint
 
 class Point:
     color = Color(128, 128, 128)
+    frozen_color = Color(128, 128, 255)
 
     def __init__(self, x, y, frozen=False):
         self.x, self.y = x, y
@@ -23,12 +24,14 @@ class Point:
         return self == item
 
     def paint(self, surface):
-        draw.rect(surface, Point.color, (self.x, self.y, 1, 1))
+        color = Point.color if not self.frozen else Point.frozen_color
+        draw.rect(surface, color, (self.x, self.y, 1, 1))
 
     def update(self, surface, points):
         if not self.frozen:
             if self.move_down(points) or self.move_to_side(points):
                 self.try_deactivate()
+            self.try_freeze()
 
         self.paint(surface)
 
@@ -36,6 +39,8 @@ class Point:
         left, right = Point(self.x - 1, self.y + 1), Point(self.x + 1, self.y + 1)
         can_left, can_right = True, True
         for point in points:
+            if not can_left and not can_right:
+                break
             if can_left and left == point:
                 can_left = False
             if can_right and right == point:
@@ -49,9 +54,11 @@ class Point:
         elif can_right:
             target = right
 
-        if target:
+        if target is not None:
             self.x, self.y = target.x, target.y
             return True
+
+        self.value += 1
         return False
 
     def move_down(self, points: list):
@@ -63,11 +70,13 @@ class Point:
         self.y = target.y
         return True
 
-    def try_deactivate(self):
-        if self.y == 499:
+    def try_freeze(self):
+        if self.y == 499 or self.value >= 100:
             self.frozen = True
 
+    def try_deactivate(self):
         if self.y >= 500:
+            self.frozen = True
             self.active = False
 
     def merge(self, points: list):
