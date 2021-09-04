@@ -7,7 +7,7 @@ import pygame
 
 def loop(surface, clock, background_color=Color(255, 255, 255)):
     points = []
-    font = get_font(background_color)
+    font = get_font(Color(0, 0, 0), background_color)
 
     while len(event.get(QUIT)) == 0:
         clock.tick(100)
@@ -25,16 +25,16 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
 
 
 def print_debug_info(surface, font, points, begin, end):
-    elapsed = int(round((end - begin) * 1000, 0))
+    elapsed = int((end - begin) * 1000)
     info = {
         'Objects': str(len(points)),
         'Frozen': f'{percent_frozen(points)} %',
         'Elapsed': f'{elapsed} ms.'
     }
-    surface.blit(debug(info, font), (0, 0))
+    surface.blit(get_debug_surface(info, font), (0, 0))
 
 
-def debug(info: dict, font: dict):
+def get_debug_surface(info: dict, font: dict):
     y = 0
     size = 500, len(info) * (font['size'] + 5)
     surface = Surface(size)
@@ -75,10 +75,10 @@ def percent_frozen(points: list):
     return 0.00
 
 
-def get_font(background_color, size=20):
+def get_font(color, background_color, size=20):
     return {
         'value': pygame.font.SysFont('Segoe UI', size),
-        'color': Color(0, 0, 0),
+        'color': color,
         'background_color': background_color,
         'size': size
     }
