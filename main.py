@@ -13,10 +13,9 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         clock.tick(100)
         begin = perf_counter()
         surface.fill(background_color, surface.get_rect())
-        gc(points)
         for point in points:
-            if point.y <= 499:
-                point.update(surface, points)
+            point.update(surface, points)
+        gc(points)
         end = perf_counter()
         print_debug_info(surface, font, points, begin, end)
         display.flip()
@@ -30,7 +29,7 @@ def gc(points):
     if len(points) > 0:
         index = 0
         while index < len(points):
-            if points[index].active:
+            if points[index].active and points[index].y <= 499:
                 index += 1
                 continue
             del points[index]
@@ -81,7 +80,7 @@ def configure_display(size=(500, 500)):
 
 def percent_frozen(points: list):
     if len(points) > 0:
-        count_frozen = len(list(filter(lambda point: point.frozen, points)))
+        count_frozen = len([0 for point in points if point.frozen])
         return round(count_frozen / len(points) * 100, 2)
 
     return 0.00
