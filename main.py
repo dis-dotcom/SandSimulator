@@ -13,8 +13,10 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         clock.tick(100)
         begin = perf_counter()
         surface.fill(background_color, surface.get_rect())
+        gc(points)
         for point in points:
-            point.update(surface, points)
+            if point.y <= 499:
+                point.update(surface, points)
         end = perf_counter()
         print_debug_info(surface, font, points, begin, end)
         display.flip()
@@ -22,6 +24,16 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
             on_left_click=lambda x, y: points.append(Point(x, y)),
             on_right_click=points.clear
         )
+
+
+def gc(points):
+    if len(points) > 0:
+        index = 0
+        while index < len(points):
+            if points[index].active:
+                index += 1
+                continue
+            del points[index]
 
 
 def print_debug_info(surface, font, points, begin, end):
