@@ -54,7 +54,7 @@ class Point:
         elif can_right:
             target = right
 
-        if target is not None:
+        if target:
             self.x, self.y = target.x, target.y
             return True
 
@@ -71,7 +71,7 @@ class Point:
         return True
 
     def try_freeze(self):
-        if self.y == 499 or self.value >= 100:
+        if self.y == 499 or self.value >= 150:
             self.frozen = True
 
     def try_deactivate(self):
