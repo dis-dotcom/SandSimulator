@@ -1,19 +1,21 @@
 from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
 from time import perf_counter
-from Point import Point
+from Point import Point, PointBlock
 from random import randint, choice
 import pygame
 
 
 def loop(surface, clock, background_color=Color(255, 255, 255)):
     points = []
-    font = get_font(background_color)
+    font = get_font(Color(0, 0, 0), background_color)
 
     while len(event.get(QUIT)) == 0:
         clock.tick(100)
         begin = perf_counter()
         surface.fill(background_color, surface.get_rect())
-        [point.update(surface, points) for point in points]
+        for point in points:
+            point.update(surface, points)
+        gc(points)
         end = perf_counter()
         print_debug_info(surface, font, points, begin, end)
         display.flip()
@@ -23,17 +25,27 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         )
 
 
+def gc(points):
+    if len(points) > 0:
+        index = 0
+        while index < len(points):
+            if points[index].active and points[index].y <= 499:
+                index += 1
+                continue
+            del points[index]
+
+
 def print_debug_info(surface, font, points, begin, end):
-    elapsed = int(round((end - begin) * 1000, 0))
+    elapsed = int((end - begin) * 1000)
     info = {
         'Objects': str(len(points)),
         'Frozen': f'{percent_frozen(points)} %',
         'Elapsed': f'{elapsed} ms.'
     }
-    surface.blit(debug(info, font), (0, 0))
+    surface.blit(get_debug_surface(info, font), (0, 0))
 
 
-def debug(info: dict, font: dict):
+def get_debug_surface(info: dict, font: dict):
     y = 0
     size = 500, len(info) * (font['size'] + 5)
     surface = Surface(size)
@@ -68,16 +80,16 @@ def configure_display(size=(500, 500)):
 
 def percent_frozen(points: list):
     if len(points) > 0:
-        count_frozen = len(list(filter(lambda point: point.frozen, points)))
+        count_frozen = len([0 for point in points if point.frozen])
         return round(count_frozen / len(points) * 100, 2)
 
     return 0.00
 
 
-def get_font(background_color, size=20):
+def get_font(color, background_color, size=20):
     return {
         'value': pygame.font.SysFont('Segoe UI', size),
-        'color': Color(0, 0, 0),
+        'color': color,
         'background_color': background_color,
         'size': size
     }
