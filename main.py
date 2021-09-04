@@ -1,6 +1,6 @@
 from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
 from time import perf_counter
-from Point import Point
+from Point import Point, PointBlock
 from random import randint, choice
 import pygame
 
@@ -13,7 +13,8 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         clock.tick(100)
         begin = perf_counter()
         surface.fill(background_color, surface.get_rect())
-        [point.update(surface, points) for point in points]
+        for point in points:
+            point.update(surface, points)
         end = perf_counter()
         print_debug_info(surface, font, points, begin, end)
         display.flip()
