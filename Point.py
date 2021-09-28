@@ -14,10 +14,10 @@ class Point:
         self.active = True
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+        return (self.x, self.y) == (other.x, other.y)
 
     def __hash__(self):
-        return hash((self.x, self.y))
+        return hash((self.x, self.y, self.active))
 
     def __contains__(self, item):
         if isinstance(item, PointBlock):
@@ -40,14 +40,18 @@ class Point:
         x, y, i, target, result = self.x, self.y, 0, None, False
 
         if 0 < x < 500 and 0 < y < 500:
-            can_left = Point.MAP[x - 1][y + 1] is None
-            can_right = Point.MAP[x + 1][y + 1] is None
+            can_left_1 = Point.MAP[x - 1][y + 1] is None
+            can_left_2 = Point.MAP[x - 2][y + 1] is None and randint(1, 2) == 2
+            can_right_1 = Point.MAP[x + 1][y + 1] is None
+            can_right_2 = Point.MAP[x + 2][y + 1] is None and randint(1, 2) == 2
+            can_left = can_left_1 or can_left_2
+            can_right = can_right_1 or can_right_2
             if can_left and can_right:
                 target = i = -1 if randint(0, 1) == 0 else 1
             elif can_left:
-                target = i = -1
+                target = i = -2 if can_left_2 else -1
             elif can_right:
-                target = i = 1
+                target = i = 2 if can_right_2 else 1
 
         if target:
             Point.MAP[x + i][y + 1] = Point.MAP[x][y + 1]
@@ -59,17 +63,18 @@ class Point:
         return result
 
     def move_down(self):
-        x, y, result = self.x, self.y, False
-        if Point.MAP[x][y + 1] is None:
-            Point.MAP[x][y + 1] = Point.MAP[x][y]
-            Point.MAP[x][y] = None
-            self.y += 1
-            result = True
+        x, y, i, result = self.x, self.y, randint(1, 2), False
+        if Point.MAP.has_index(x, y + i):
+            if Point.MAP[x][y + i] is None:
+                Point.MAP[x][y + i] = Point.MAP[x][y]
+                Point.MAP[x][y] = None
+                self.y += i
+                result = True
 
         return result
 
     def try_freeze(self):
-        if self.y == 499 or self.value >= 150:
+        if self.y >= 499 or self.value >= 150:
             self.frozen = True
 
     def try_deactivate(self):
