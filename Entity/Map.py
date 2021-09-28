@@ -5,8 +5,10 @@ class Map:
         self.set_size(size, size)
 
     def __contains__(self, item):
-        x, y = item.x, item.y
-        if self.__map__
+        try:
+            return self.__map__[item.x][item.y] is not None
+        except:
+            return False
 
     def __getitem__(self, item):
         return self.__map__[item]
