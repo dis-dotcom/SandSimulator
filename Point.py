@@ -3,6 +3,7 @@ from random import randint
 
 
 class Point:
+    MAP = None
     color = Color(128, 128, 128)
     frozen_color = Color(128, 128, 255)
 
@@ -27,48 +28,49 @@ class Point:
         color = Point.color if not self.frozen else Point.frozen_color
         draw.rect(surface, color, (self.x, self.y, 1, 1))
 
-    def update(self, surface, points):
+    def update(self, surface):
         if not self.frozen:
-            if self.move_down(points) or self.move_to_side(points):
+            if self.move_down() or self.move_to_side():
                 self.try_deactivate()
             self.try_freeze()
 
         self.paint(surface)
 
-    def move_to_side(self, points: list):
-        left, right = Point(self.x - 1, self.y + 1), Point(self.x + 1, self.y + 1)
-        can_left, can_right = True, True
-        for point in points:
-            if not can_left and not can_right:
-                break
-            if can_left and left == point:
-                can_left = False
-            if can_right and right == point:
-                can_right = False
+    def move_to_side(self):
+        x, y, i, target, result = self.x, self.y, 0, None, False
 
-        target = None
-        if can_left and can_right:
-            target = left if randint(0, 1) == 0 else right
-        elif can_left:
-            target = left
-        elif can_right:
-            target = right
+        if 0 < x < 500 and 0 < y < 500:
+            can_left = Point.MAP[x - 1][y + 1] is None
+            can_right = Point.MAP[x + 1][y + 1] is None
+            if can_left and can_right:
+                target = i = -1 if randint(0, 1) == 0 else 1
+            elif can_left:
+                target = i = -1
+            elif can_right:
+                target = i = 1
 
         if target:
-            self.x, self.y = target.x, target.y
-            return True
+            Point.MAP[x + i][y + 1] = Point.MAP[x][y + 1]
+            Point.MAP[x][y] = None
+            self.x, self.y = x + i, y + 1
+            result = True
 
         self.value += 1
-        return False
+        return result
 
-    def move_down(self, points: list):
-        target = Point(self.x, self.y + 1)
-        for point in points:
-            if target == point:
+    def move_down(self, i=1):
+        if i == 2:
+            if not self.move_down(1):
                 return False
 
-        self.y = target.y
-        return True
+        x, y, result = self.x, self.y, False
+        if Point.MAP[x][y + 1] is None:
+            Point.MAP[x][y + 1] = Point.MAP[x][y]
+            Point.MAP[x][y] = None
+            self.y += 1
+            result = True
+
+        return result
 
     def try_freeze(self):
         if self.y == 499 or self.value >= 150:
