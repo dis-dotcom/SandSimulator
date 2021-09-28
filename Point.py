@@ -58,11 +58,7 @@ class Point:
         self.value += 1
         return result
 
-    def move_down(self, i=1):
-        if i == 2:
-            if not self.move_down(1):
-                return False
-
+    def move_down(self):
         x, y, result = self.x, self.y, False
         if Point.MAP[x][y + 1] is None:
             Point.MAP[x][y + 1] = Point.MAP[x][y]
