@@ -1,12 +1,14 @@
 from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
 from time import perf_counter
-from Point import Point, PointBlock
-from random import randint, choice
+from Point import Point
+from random import randint
+from Entity.Map import Map
 import pygame
 
 
 def loop(surface, clock, background_color=Color(255, 255, 255)):
-    points = []
+    Point.MAP = Map([], 501)
+    points = Point.MAP.points()
     font = get_font(Color(0, 0, 0), background_color)
 
     while len(event.get(QUIT)) == 0:
@@ -14,18 +16,32 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
         begin = perf_counter()
         surface.fill(background_color, surface.get_rect())
         for point in points:
-            point.update(surface, points)
-        gc(points)
+            point.update(surface)
+        gc(Point.MAP, points)
         end = perf_counter()
         print_debug_info(surface, font, points, begin, end)
         display.flip()
         mouse_handle(
-            on_left_click=lambda x, y: points.append(Point(x, y)),
-            on_right_click=points.clear
+            on_left_click=lambda x, y: create_point(x, y, points, Point.MAP),
+            on_right_click=lambda: clear_points(points)
         )
 
 
-def gc(points):
+def create_point(x, y, points, array):
+    if 0 <= x < 500 and 0 <= y < 500:
+        point = Point(x, y)
+        point.MAP = array
+        points.append(point)
+        array[x][y] = point
+
+
+def clear_points(points):
+    if len(points) > 0:
+        points[0].MAP.clear()
+    points.clear()
+
+
+def gc(_map_, points):
     if len(points) > 0:
         index = 0
         while index < len(points):
