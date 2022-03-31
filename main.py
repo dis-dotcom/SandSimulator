@@ -3,6 +3,7 @@ from time import perf_counter
 from Point import Point
 from random import randint
 from Entity.Map import Map
+from vector import Vector, Canvas
 import pygame
 
 
@@ -10,16 +11,25 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
     Point.MAP = Map([], 501)
     points = Point.MAP.points()
     font = get_font(Color(0, 0, 0), background_color)
+    canvas = Canvas(surface)
+    canvas.background_color = background_color
+    vector_map = [[Vector(250, 250), Vector(500 - 5, 500 - 5)]]
 
     while len(event.get(QUIT)) == 0:
         clock.tick(100)
         begin = perf_counter()
-        surface.fill(background_color, surface.get_rect())
+
+        canvas.fill()
+        for row in vector_map:
+            for vector in row:
+                canvas.paint(vector)
+
         for point in points:
             point.update(surface)
         gc(Point.MAP, points)
         end = perf_counter()
         print_debug_info(surface, font, points, begin, end)
+
         display.flip()
         mouse_handle(
             on_left_click=lambda x, y: create_point(x, y, points, Point.MAP),
