@@ -1,18 +1,22 @@
-from pygame import init, display, time, event, QUIT, Color, Surface, mouse, quit
+from pygame import init, display, time, event, QUIT, mouse, quit
 from time import perf_counter
 from Point import Point
 from random import randint
 from Entity.Map import Map
-from vector import Vector, Canvas
-import pygame
+from vector import Vector
+from GUI import GUI
+from config import Config
 
 
-def loop(surface, clock, background_color=Color(255, 255, 255)):
+def loop(clock):
+    config = Config()
+    gui = GUI(config)
+    canvas = gui.configure()
+    surface = canvas.surface
+
     Point.MAP = Map([], 501)
     points = Point.MAP.points()
-    font = get_font(Color(0, 0, 0), background_color)
-    canvas = Canvas(surface)
-    canvas.background_color = background_color
+
     vector_map = [[Vector(250, 250), Vector(500 - 5, 500 - 5)]]
 
     while len(event.get(QUIT)) == 0:
@@ -26,9 +30,10 @@ def loop(surface, clock, background_color=Color(255, 255, 255)):
 
         for point in points:
             point.update(surface)
-        gc(Point.MAP, points)
+        gc(points)
+
         end = perf_counter()
-        print_debug_info(surface, font, points, begin, end)
+        gui.info(points, begin, end)
 
         display.flip()
         mouse_handle(
@@ -51,7 +56,7 @@ def clear_points(points):
     points.clear()
 
 
-def gc(_map_, points):
+def gc(points):
     if len(points) > 0:
         index = 0
         while index < len(points):
@@ -61,69 +66,20 @@ def gc(_map_, points):
             del points[index]
 
 
-def print_debug_info(surface, font, points, begin, end):
-    elapsed = int((end - begin) * 1000)
-    info = {
-        'Objects': str(len(points)),
-        'Frozen': f'{percent_frozen(points)} %',
-        'Elapsed': f'{elapsed} ms.'
-    }
-    surface.blit(get_debug_surface(info, font), (0, 0))
-
-
-def get_debug_surface(info: dict, font: dict):
-    y = 0
-    size = 500, len(info) * (font['size'] + 5)
-    surface = Surface(size)
-    surface.fill(font['background_color'])
-    for key in info.keys():
-        line = f'{key}: {info[key]}'
-        surface.blit(font['value'].render(line, True, font['color']), (15, y))
-        y += font['size']
-
-    return surface
-
-
 def mouse_handle(on_left_click, on_right_click):
-    buttons = mouse.get_pressed(3)
-    if buttons[0]:
+    left, _, right = mouse.get_pressed(3)
+    if left:
         shift = 5
         x, y = mouse.get_pos()
         shift_x, shift_y = randint(-shift, shift), randint(-shift, shift)
         on_left_click(x + shift_x, y + shift_y)
-    elif buttons[2]:
+    elif right:
         on_right_click()
-
-
-def configure_display(size=(500, 500)):
-    surface = display.set_mode(size)
-    display.set_caption('')
-    icon = Surface([50, 50])
-    icon.fill(Color(255, 255, 255))
-    display.set_icon(icon)
-    return surface
-
-
-def percent_frozen(points: list):
-    if len(points) > 0:
-        count_frozen = len([0 for point in points if point.frozen])
-        return round(count_frozen / len(points) * 100, 2)
-
-    return 0.00
-
-
-def get_font(color, background_color, size=20):
-    return {
-        'value': pygame.font.SysFont('Segoe UI', size),
-        'color': color,
-        'background_color': background_color,
-        'size': size
-    }
 
 
 def main():
     init()
-    loop(configure_display(), time.Clock())
+    loop(time.Clock())
     quit()
 
 
