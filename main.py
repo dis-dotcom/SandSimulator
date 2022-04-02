@@ -66,7 +66,7 @@ def gc(points):
 
 
 def mouse_handle(on_left_click, on_right_click):
-    left, _, right = mouse.get_pressed(3)
+    left, _, right = mouse.get_pressed()
     if left:
         shift = 5
         x, y = mouse.get_pos()
