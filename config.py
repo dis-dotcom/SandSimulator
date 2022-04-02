@@ -8,8 +8,3 @@ class Config:
 
         self.canvas_size = 500, 500
         self.background_color = Color(255, 255, 255)
-
-    background_color = Color(255, 255, 255)
-    text_color = Color(0, 0, 0)
-    text_size = 20
-    canvas_size = 500, 500
