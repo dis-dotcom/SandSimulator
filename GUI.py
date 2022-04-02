@@ -26,7 +26,7 @@ class GUI:
         elapsed = int((end - begin) * 1000)
         info = {
             'Objects': str(len(points)),
-            'Frozen': f'{GUI.percent_frozen(points)} %',
+            'Frozen': f'{self.percent_frozen(points)} %',
             'Elapsed': f'{elapsed} ms.'
         }
         self.surface.blit(self.get_debug_surface(info), (0, 0))
@@ -51,15 +51,15 @@ class GUI:
             'size': self.config.text_size
         }
 
-    @staticmethod
-    def percent_frozen(points: list):
-        count = len(points)
-        if count > 0:
-            count_frozen = 0
-            for point in points:
-                if point.frozen:
-                    count_frozen += 1
+    def percent_frozen(self, points: list) -> float:
+        return self.get_formatted_value(self.count_frozen(points), len(points)) if len(points) > 0 else 0.00
 
-            return round((count_frozen / count) * 100, 2)
+    def get_formatted_value(self, a, b) -> float:
+        return round((a / b) * 100, 2)
 
-        return 0.00
+    def count_frozen(self, points: list) -> int:
+        count = 0
+        for point in points:
+            if point.frozen:
+                count += 1
+        return count
