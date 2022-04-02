@@ -8,7 +8,7 @@ from vector import Canvas
 class GUI:
     def __init__(self, config: Config):
         self.config = config
-        self.font = self.get_font()
+        self.font = self.__get_default_font__()
         self.surface = None
         self.canvas = None
 
@@ -31,14 +31,6 @@ class GUI:
         }
         self.surface.blit(self.get_debug_surface(info), (0, 0))
 
-    def get_font(self):
-        return {
-            'value': SysFont('Segoe UI', self.config.text_size),
-            'color': self.config.text_color,
-            'background_color': self.config.background_color,
-            'size': self.config.text_size
-        }
-
     def get_debug_surface(self, info: dict) -> Surface:
         y = 0
         size = 500, len(info) * (self.font['size'] + 5)
@@ -51,11 +43,23 @@ class GUI:
 
         return surface
 
+    def __get_default_font__(self):
+        return {
+            'value': SysFont('Segoe UI', self.config.text_size),
+            'color': self.config.text_color,
+            'background_color': self.config.background_color,
+            'size': self.config.text_size
+        }
+
     @staticmethod
     def percent_frozen(points: list):
         count = len(points)
         if count > 0:
-            count_frozen = len([None for point in points if point.frozen])
+            count_frozen = 0
+            for point in points:
+                if point.frozen:
+                    count_frozen += 1
+
             return round((count_frozen / count) * 100, 2)
 
         return 0.00
