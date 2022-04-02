@@ -12,7 +12,6 @@ def loop(clock):
     config = Config()
     gui = GUI(config)
     canvas = gui.configure()
-    surface = canvas.surface
 
     Point.MAP = Map([], 501)
     points = Point.MAP.points()
@@ -29,7 +28,7 @@ def loop(clock):
                 canvas.paint(vector)
 
         for point in points:
-            point.update(surface)
+            point.update(canvas.surface)
         gc(points)
 
         end = perf_counter()
