@@ -1,5 +1,8 @@
 from pygame import init, display, time, event, QUIT, mouse, quit
 from time import perf_counter
+
+from Scene import Scene
+from EventBus import EventBus
 from Point import Point
 from random import randint
 from Entity.Map import Map
@@ -17,6 +20,7 @@ def loop(clock):
     points = Point.MAP.points()
 
     vector_map = [[Vector(250, 250), Vector(500 - 5, 500 - 5)]]
+    scene = Scene(canvas.surface)
 
     while len(event.get(QUIT)) == 0:
         clock.tick(100)
@@ -29,6 +33,8 @@ def loop(clock):
 
         for point in points:
             point.update(canvas.surface)
+
+        scene.paint()
         gc(points)
 
         end = perf_counter()
@@ -36,17 +42,9 @@ def loop(clock):
 
         display.flip()
         mouse_handle(
-            on_left_click=lambda x, y: create_point(x, y, points, Point.MAP),
+            on_left_click=lambda x, y: EventBus.create_point(x, y),
             on_right_click=lambda: clear_points(points)
         )
-
-
-def create_point(x, y, points, array):
-    if 0 <= x < 500 and 0 <= y < 500:
-        point = Point(x, y)
-        point.MAP = array
-        points.append(point)
-        array[x][y] = point
 
 
 def clear_points(points):
